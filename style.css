@@ -100,3 +100,17 @@ body {
   background-color: rgba(0, 255, 0, 0.08);
 }
 */
+
+.minuend,
+.subtrahend {
+  transition: opacity 0.3s ease;
+  display: inline-block; /* or flex, if used in grid */
+}
+
+.fade-out {
+  opacity: 0;
+}
+
+.fade-in {
+  opacity: 1;
+}
