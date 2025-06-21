@@ -79,12 +79,16 @@ body:hover {
   grid-column: 2 / 3;
   grid-row: 4 / 5;
   font-size: 2em;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  display: block; /* Ensure it takes space even hidden */
 }
 
 .show-answer .answer {
   opacity: 1;
+}
+
+/* Hide answer by default */
+.hide-answer .answer {
+  opacity: 0;
 }
 
 .minuend,

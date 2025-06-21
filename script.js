@@ -13,7 +13,7 @@ function generateProblem(flashcard, callback) {
   const subtrahendEl = flashcard.querySelector('.subtrahend');
   const answerEl = flashcard.querySelector('.answer');
 
-  if (!minuendEl || !subtrahendEl || !answerEl) return;
+  if (!minuendEl || !subtrahendEl) return;
 
   // Step 1: Fade out
   minuendEl.classList.remove('fade-in');
@@ -34,7 +34,11 @@ function generateProblem(flashcard, callback) {
     minuendEl.textContent = String(larger).padStart(2, ' ');
     subtrahendEl.textContent = String(smaller).padStart(2, ' ');
 
-    answerEl.textContent = flashcard.dataset.answer; // Store answer visually
+    // Set answer text but keep it hidden
+    if (answerEl) {
+      answerEl.textContent = flashcard.dataset.answer;
+      answerEl.style.opacity = '0'; // Instantly hide the answer
+    }
 
     // Force reflow to restart animation
     void minuendEl.offsetWidth;
@@ -47,9 +51,6 @@ function generateProblem(flashcard, callback) {
     subtrahendEl.classList.remove('fade-out');
     subtrahendEl.classList.add('fade-in');
 
-    // Hide answer after reset
-    flashcard.classList.remove('show-answer');
-
     // Optional: run a callback after animation
     if (callback) callback();
 
@@ -58,10 +59,20 @@ function generateProblem(flashcard, callback) {
 
 function toggleAnswer(flashcard) {
   if (!flashcard) return;
+
   if (!flashcard.dataset.answer) {
     generateProblem(flashcard);
   }
-  flashcard.classList.toggle('show-answer');
+
+  const answerEl = flashcard.querySelector('.answer');
+  if (!answerEl) return;
+
+  // Toggle visibility manually
+  if (answerEl.style.opacity === '1') {
+    answerEl.style.opacity = '0';
+  } else {
+    answerEl.style.opacity = '1';
+  }
 }
 
 // Wait for DOM to load before accessing elements
