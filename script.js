@@ -2,8 +2,13 @@ function getRandomTwoDigitNumber() {
   return Math.floor(Math.random() * 90) + 10; // 10 to 99
 }
 
-function getRandomTwoDigitNumber() {
-  return Math.floor(Math.random() * 90) + 10; // 10 to 99
+function formatAnswer(answer) {
+  const str = answer.toString();
+  if (str.length === 1) {
+    return '\u2002' + str; // Single-digit → "x5"
+  } else {
+    return str; // Two-digits → "42"
+  }
 }
 
 function generateProblem(flashcard, callback) {
@@ -15,46 +20,48 @@ function generateProblem(flashcard, callback) {
 
   if (!minuendEl || !subtrahendEl) return;
 
-  // Step 1: Fade out
+  // Fade out current numbers
   minuendEl.classList.remove('fade-in');
   minuendEl.classList.add('fade-out');
 
   subtrahendEl.classList.remove('fade-in');
   subtrahendEl.classList.add('fade-out');
 
-  // Step 2: Wait for fade-out animation to finish
+  // Wait for fade-out to complete
   setTimeout(() => {
     const minuend = getRandomTwoDigitNumber();
     const subtrahend = getRandomTwoDigitNumber();
     const larger = Math.max(minuend, subtrahend);
     const smaller = Math.min(minuend, subtrahend);
+    const answer = larger - smaller;
 
-    flashcard.dataset.answer = larger - smaller;
+    // Store actual numeric answer for correctness checks
+    flashcard.dataset.answer = answer;
 
+    // Format and display values
     minuendEl.textContent = String(larger).padStart(2, ' ');
     subtrahendEl.textContent = String(smaller).padStart(2, ' ');
 
-    // Set answer text but keep it hidden
     if (answerEl) {
-      answerEl.textContent = flashcard.dataset.answer;
-      answerEl.style.opacity = '0'; // Instantly hide the answer
+      answerEl.textContent = formatAnswer(answer); // formatted answer here
+      answerEl.style.opacity = '0'; // keep hidden initially
     }
 
     // Force reflow to restart animation
     void minuendEl.offsetWidth;
     void subtrahendEl.offsetWidth;
 
-    // Step 3: Fade in
+    // Fade in new numbers
     minuendEl.classList.remove('fade-out');
     minuendEl.classList.add('fade-in');
 
     subtrahendEl.classList.remove('fade-out');
     subtrahendEl.classList.add('fade-in');
 
-    // Optional: run a callback after animation
+    // Run optional callback after animation
     if (callback) callback();
 
-  }, 300); // Match CSS transition duration
+  }, 300); // match CSS transition duration
 }
 
 function toggleAnswer(flashcard) {
