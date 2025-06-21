@@ -1,3 +1,4 @@
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -6,101 +7,96 @@
 
 body {
   font-family: 'Courier New', Courier, monospace;
-  background-color: #434343; /* 🔲 Changed from black to dark gray */
+  background-color: #434343;
   color: #00FF00;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  cursor: pointer; /* ← Clicking outside will do something */
-}
-body:hover {
-  background-color: #434343;
-  transition: background-color 1.3s ease;
+  cursor: pointer;
 }
 
 .flashcard {
-  background-color: #434343; /* 📦 Card also uses dark gray */
+  background-color: #434343;
   border: 2px solid #00FF00;
   border-radius: 10px;
-  width: 90%;
-  max-width: 300px;
-  padding: 25px;
+  width: 380px;
+  max-width: 90vw;
+  padding: 22px 28px;
   box-shadow: 0 0 10px #00FF00;
   cursor: pointer;
   text-align: center;
+  user-select: none;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  gap: 5px;
-  width: 100%;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 0.2fr 0.8fr; /* 4 rows: answer now gets its own row */
+  gap: 0;
+  align-items: end;
 }
 
 .grid > div {
-  font-size: 2em;
+  min-height: 1.2em;
+  font-size: 2.2em;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #00FF00;
 }
 
 .minuend {
   grid-column: 2 / 3;
   grid-row: 1 / 2;
-  font-size: 2.5em;
   justify-content: flex-end;
+  font-size: 2.4em;
+  padding-right: 0.15em;
 }
 
 .minus-sign {
   grid-column: 1 / 2;
   grid-row: 2 / 3;
-  font-size: 2.3em;
-  justify-content: flex-start;
+  font-size: 2em;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding-right: 0.12em;
 }
 
 .subtrahend {
   grid-column: 2 / 3;
   grid-row: 2 / 3;
-  font-size: 2.5em;
   justify-content: flex-end;
+  align-items: center;
+  padding-right: 0.15em;
+  font-size: 2.4em;
 }
 
 .line {
-  grid-column: 1 / -1;
+  grid-column: 1 / 4;
   grid-row: 3 / 4;
   border-top: 2px solid #00FF00;
-  margin: 8px 0;
+  width: 100%;
+  justify-self: stretch;
+  margin: 0;
+  position: relative;
+  top: 0;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .answer {
   grid-column: 2 / 3;
   grid-row: 4 / 5;
-  font-size: 2em;
-  display: block; /* Ensure it takes space even hidden */
+  justify-content: flex-end;
+  align-items: center;
+  padding-right: 0.15em;
+  font-size: 2.4em;
 }
 
-.show-answer .answer {
-  opacity: 1;
+/* Optional: Uncomment for grid debugging
+.cell1, .cell3, .cell6, .cell7, .cell9 {
+  background-color: rgba(0, 255, 0, 0.08);
 }
-
-/* Hide answer by default */
-.hide-answer .answer {
-  opacity: 0;
-}
-
-.minuend,
-.subtrahend {
-  transition: opacity 0.3s ease;
-  display: inline-block; /* Required for reflow trick */
-}
-
-.fade-out {
-  opacity: 0;
-}
-
-.fade-in {
-  opacity: 1;
-}
+*/
