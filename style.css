@@ -86,3 +86,17 @@ body:hover {
 .show-answer .answer {
   opacity: 1;
 }
+
+.minuend,
+.subtrahend {
+  transition: opacity 0.3s ease;
+  display: inline-block; /* Required for reflow trick */
+}
+
+.fade-out {
+  opacity: 0;
+}
+
+.fade-in {
+  opacity: 1;
+}
