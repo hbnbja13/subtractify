@@ -3,23 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Aligned Flashcards with Empty Grid Cells</title>
+  <title>Subtractify</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <div class="flashcard" id="flashcard">
-    <div class="grid">
-      <div class="cell1"></div>
-      <div class="minuend">__</div>
-      <div class="cell3"></div>
-      <div class="minus-sign">−</div>
-      <div class="subtrahend">__</div>
-      <div class="cell6"></div>
-      <div class="answer">??</div>
-      
-    </div>
+  <div class="mode-bar">
+    <label for="mode-select">
+      Mode:
+      <select id="mode-select">
+        <option value="normal">Normal Random</option>
+        <option value="borrow">Borrow Required&nbsp;(ones digit less)</option>
+        <option value="noborrow">No Borrow&nbsp;(ones digit greater)</option>
+      </select>
+    </label>
   </div>
+
+  <div id="flashcards"></div>
 
   <script src="script.js"></script>
 </body>

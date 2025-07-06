@@ -1,5 +1,53 @@
+// --- Problem Generators ---
+
 function getRandomTwoDigitNumber() {
   return Math.floor(Math.random() * 90) + 10; // 10 to 99
+}
+
+function generateNormalProblem() {
+  let a = getRandomTwoDigitNumber();
+  let b = getRandomTwoDigitNumber();
+  if (a < b) [a, b] = [b, a]; // Ensure minuend >= subtrahend
+  return { minuend: a, subtrahend: b };
+}
+
+function generateBorrowProblem() {
+  while (true) {
+    const tens1 = Math.floor(Math.random() * 9) + 1;
+    const tens2 = Math.floor(Math.random() * 9) + 1;
+    const onesSubtrahend = Math.floor(Math.random() * 9) + 1;
+    const onesMinuend = Math.floor(Math.random() * onesSubtrahend);
+    const minuend = tens1 * 10 + onesMinuend;
+    const subtrahend = tens2 * 10 + onesSubtrahend;
+    // Borrowing: ones(minuend) < ones(subtrahend) AND not negative
+    if (onesMinuend < onesSubtrahend && minuend >= subtrahend) {
+      return { minuend, subtrahend };
+    }
+  }
+}
+
+function generateNoBorrowProblem() {
+  while (true) {
+    const tens1 = Math.floor(Math.random() * 9) + 1;
+    const tens2 = Math.floor(Math.random() * 9) + 1;
+    const onesMinuend = Math.floor(Math.random() * 9) + 1;
+    const onesSubtrahend = Math.floor(Math.random() * onesMinuend);
+    const minuend = tens1 * 10 + onesMinuend;
+    const subtrahend = tens2 * 10 + onesSubtrahend;
+    // No borrowing: ones(minuend) > ones(subtrahend) AND not negative
+    if (onesMinuend > onesSubtrahend && minuend >= subtrahend) {
+      return { minuend, subtrahend };
+    }
+  }
+}
+
+// --- Mode Management ---
+let currentMode = 'normal'; // default
+
+function getProblemByMode() {
+  if (currentMode === 'borrow') return generateBorrowProblem();
+  if (currentMode === 'noborrow') return generateNoBorrowProblem();
+  return generateNormalProblem();
 }
 
 function formatAnswer(answer) {
@@ -11,6 +59,8 @@ function formatAnswer(answer) {
   }
 }
 
+// --- Flashcard Creation ---
+
 function generateProblem(flashcard, callback) {
   if (!flashcard) return;
 
@@ -18,91 +68,118 @@ function generateProblem(flashcard, callback) {
   const subtrahendEl = flashcard.querySelector('.subtrahend');
   const answerEl = flashcard.querySelector('.answer');
 
-  if (!minuendEl || !subtrahendEl) return;
+  if (!minuendEl || !subtrahendEl || !answerEl) return;
 
   // Fade out current numbers
   minuendEl.classList.remove('fade-in');
   minuendEl.classList.add('fade-out');
-
   subtrahendEl.classList.remove('fade-in');
   subtrahendEl.classList.add('fade-out');
 
-  // Wait for fade-out to complete
+  // Hide answer and border before resetting content
+  answerEl.style.opacity = '0';
+  answerEl.classList.remove('revealed');
+
   setTimeout(() => {
-    const minuend = getRandomTwoDigitNumber();
-    const subtrahend = getRandomTwoDigitNumber();
-    const larger = Math.max(minuend, subtrahend);
-    const smaller = Math.min(minuend, subtrahend);
-    const answer = larger - smaller;
+    const { minuend, subtrahend } = getProblemByMode();
+    const answer = minuend - subtrahend;
 
-    // Store actual numeric answer for correctness checks
     flashcard.dataset.answer = answer;
+    minuendEl.textContent = String(minuend).padStart(2, ' ');
+    subtrahendEl.textContent = String(subtrahend).padStart(2, ' ');
 
-    // Format and display values
-    minuendEl.textContent = String(larger).padStart(2, ' ');
-    subtrahendEl.textContent = String(smaller).padStart(2, ' ');
+    answerEl.textContent = formatAnswer(answer);
 
-    if (answerEl) {
-      answerEl.textContent = formatAnswer(answer); // formatted answer here
-      answerEl.style.opacity = '0'; // keep hidden initially
-    }
-
-    // Force reflow to restart animation
+    // Animation
     void minuendEl.offsetWidth;
     void subtrahendEl.offsetWidth;
 
-    // Fade in new numbers
     minuendEl.classList.remove('fade-out');
     minuendEl.classList.add('fade-in');
-
     subtrahendEl.classList.remove('fade-out');
     subtrahendEl.classList.add('fade-in');
 
-    // Run optional callback after animation
     if (callback) callback();
-
-  }, 300); // match CSS transition duration
+  }, 300);
 }
 
 function toggleAnswer(flashcard) {
   if (!flashcard) return;
-
   if (!flashcard.dataset.answer) {
     generateProblem(flashcard);
   }
-
   const answerEl = flashcard.querySelector('.answer');
   if (!answerEl) return;
-
-  // Toggle visibility manually
   if (answerEl.style.opacity === '1') {
     answerEl.style.opacity = '0';
+    answerEl.classList.remove('revealed');
   } else {
     answerEl.style.opacity = '1';
+    answerEl.classList.add('revealed');
   }
 }
 
-// Wait for DOM to load before accessing elements
-document.addEventListener('DOMContentLoaded', function () {
-  const flashcard = document.getElementById('flashcard');
+function createFlashcard() {
+  const flashcard = document.createElement('div');
+  flashcard.className = 'flashcard';
 
-  if (flashcard) {
-    flashcard.addEventListener('click', function () {
-      toggleAnswer(flashcard);
+  flashcard.innerHTML = `
+    <div class="grid">
+      <div class="cell1"></div>
+      <div class="minuend">__</div>
+      <div class="cell3"></div>
+      <div class="minus-sign">−</div>
+      <div class="subtrahend">__</div>
+      <div class="cell6"></div>
+      <div class="answer">??</div>
+    </div>
+  `;
+
+  generateProblem(flashcard);
+
+  // Click toggles answer for this card
+  flashcard.addEventListener('click', function (e) {
+    e.stopPropagation(); // Avoid triggering body click
+    toggleAnswer(flashcard);
+  });
+
+  return flashcard;
+}
+
+// --- Bootstrapping ---
+
+document.addEventListener('DOMContentLoaded', function () {
+  const flashcardsContainer = document.getElementById('flashcards');
+  const modeSelect = document.getElementById('mode-select');
+  if (!flashcardsContainer) return;
+
+  function regenerateAll() {
+    const cards = flashcardsContainer.querySelectorAll('.flashcard');
+    cards.forEach(card => {
+      generateProblem(card, () => {
+        card.classList.remove('show-answer');
+      });
     });
   }
 
-  // Handle outside click
-  document.body.addEventListener('click', function (event) {
-    if (!flashcard) return;
+  // Create 10 flashcards
+  for (let i = 0; i < 10; i++) {
+    const card = createFlashcard();
+    flashcardsContainer.appendChild(card);
+  }
 
-    if (!flashcard.contains(event.target)) {
-      generateProblem(flashcard, () => {
-        flashcard.classList.remove('show-answer');
-      });
+  // Change mode when dropdown changes
+  if (modeSelect) {
+    modeSelect.addEventListener('change', function () {
+      currentMode = this.value;
+      regenerateAll();
+    });
+  }
+
+  // Optional: clicking outside all flashcards refreshes all cards
+  document.body.addEventListener('click', function (event) {
+    if (!flashcardsContainer.contains(event.target)) {
+      regenerateAll();
     }
   });
-
-  // Generate initial problem
-  generateProblem(flashcard);
 });
