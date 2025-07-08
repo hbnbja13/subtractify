@@ -1,3 +1,4 @@
+/* ===== Reset and Base Styles ===== */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -11,14 +12,60 @@ body {
   min-height: 100vh;
   min-width: 100vw;
   padding: 20px 0;
-  /* Removed display: flex; align-items/justify-content for grid layout */
   cursor: pointer;
 }
 
+/* ===== Controls Bar Styles ===== */
+.controls-bar {
+  margin-bottom: 1em;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 1.5em;
+  justify-content: flex-start;
+}
+
+.controls-bar label {
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: .01em;
+}
+
+#num-cards {
+  width: 3em;
+  font-size: 1em;
+  padding: .1em .3em;
+  margin-left:.5em;
+  background: #232323;
+  color: #00FF00;
+  border: 1px solid #00FF00;
+  border-radius: 3px;
+  outline: none;
+}
+
+#num-cards:focus {
+  border-color: #35ff35;
+}
+
+#mode-select {
+  font-size: 1em;
+  padding: 0.1em 0.3em;
+  background: #232323;
+  color: #00FF00;
+  border: 1px solid #00FF00;
+  border-radius: 3px;
+  outline: none;
+}
+
+#mode-select:focus {
+  border-color: #35ff35;
+}
+
+/* ===== Flashcards Grid ===== */
 #flashcards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 28px 15px; /* vertical gap, horizontal gap */
+  gap: 28px 15px;
   width: 100vw;
   max-width: 1280px;
   margin: 0 auto;
@@ -28,6 +75,7 @@ body {
   align-items: start;
 }
 
+/* ===== Flashcard Styles ===== */
 .flashcard {
   background-color: #434343;
   border: 2px solid #00FF00;
@@ -41,8 +89,14 @@ body {
   text-align: center;
   user-select: none;
   margin: 0;
+  transition: border-color 0.2s;
 }
 
+.flashcard:active {
+  border-color: #35ff35;
+}
+
+/* ===== Flashcard Content Grid ===== */
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -113,18 +167,15 @@ body {
     border-color 0.3s ease;
   padding: 0.1em 0.5em;
 }
+
 .answer.revealed {
-  border-color: #00FF00; /* Highlight color when revealed */
+  border-color: #00FF00;
 }
 
-/*
-.cell1, .cell3, .cell6, .cell7, .cell9 {
-  background-color: rgba(0, 255, 0, 0.08);
-}
-*/
+/* .cell1, .cell3, .cell6, .cell7, .cell9 { background-color: rgba(0, 255, 0, 0.08); } */
 
 .minuend, .subtrahend, .answer {
-  border: 1px solid #434343;   /* Match your background color for "invisible" border */
+  border: 1px solid #434343;
   border-radius: 4px;
   transition:
     opacity 0.3s ease,

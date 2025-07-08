@@ -7,7 +7,7 @@ function getRandomTwoDigitNumber() {
 function generateNormalProblem() {
   let a = getRandomTwoDigitNumber();
   let b = getRandomTwoDigitNumber();
-  if (a < b) [a, b] = [b, a]; // Ensure minuend >= subtrahend
+  if (a < b) [a, b] = [b, a];
   return { minuend: a, subtrahend: b };
 }
 
@@ -19,7 +19,6 @@ function generateBorrowProblem() {
     const onesMinuend = Math.floor(Math.random() * onesSubtrahend);
     const minuend = tens1 * 10 + onesMinuend;
     const subtrahend = tens2 * 10 + onesSubtrahend;
-    // Borrowing: ones(minuend) < ones(subtrahend) AND not negative
     if (onesMinuend < onesSubtrahend && minuend >= subtrahend) {
       return { minuend, subtrahend };
     }
@@ -34,7 +33,6 @@ function generateNoBorrowProblem() {
     const onesSubtrahend = Math.floor(Math.random() * onesMinuend);
     const minuend = tens1 * 10 + onesMinuend;
     const subtrahend = tens2 * 10 + onesSubtrahend;
-    // No borrowing: ones(minuend) > ones(subtrahend) AND not negative
     if (onesMinuend > onesSubtrahend && minuend >= subtrahend) {
       return { minuend, subtrahend };
     }
@@ -53,9 +51,9 @@ function getProblemByMode() {
 function formatAnswer(answer) {
   const str = answer.toString();
   if (str.length === 1) {
-    return '\u2002' + str; // Single-digit → "x5"
+    return '\u2002' + str;
   } else {
-    return str; // Two-digits → "42"
+    return str;
   }
 }
 
@@ -151,9 +149,29 @@ function createFlashcard() {
 document.addEventListener('DOMContentLoaded', function () {
   const flashcardsContainer = document.getElementById('flashcards');
   const modeSelect = document.getElementById('mode-select');
+  const numCardsInput = document.getElementById('num-cards');
   if (!flashcardsContainer) return;
 
-  function regenerateAll() {
+  // Helper to (re)create n flashcards
+  function createNCards(n) {
+    flashcardsContainer.innerHTML = '';
+    for (let i = 0; i < n; i++) {
+      const card = createFlashcard();
+      flashcardsContainer.appendChild(card);
+    }
+  }
+
+  // Helper to update to the current number of cards input by user
+  function updateNumCards() {
+    let n = parseInt(numCardsInput.value, 10);
+    if (isNaN(n) || n < 1) n = 1;
+    if (n > 50) n = 50;
+    createNCards(n);
+  }
+
+  // Keep current cards, but update their problems when mode changes or on global refresh
+  // Keep current cards, but update their problems when mode changes or on global refresh
+  function regenerateAllProblems() {
     const cards = flashcardsContainer.querySelectorAll('.flashcard');
     cards.forEach(card => {
       generateProblem(card, () => {
@@ -162,24 +180,28 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // Create 10 flashcards
-  for (let i = 0; i < 10; i++) {
-    const card = createFlashcard();
-    flashcardsContainer.appendChild(card);
-  }
+  // Initial cards
+  updateNumCards();
 
-  // Change mode when dropdown changes
+  // React to mode changes
   if (modeSelect) {
     modeSelect.addEventListener('change', function () {
       currentMode = this.value;
-      regenerateAll();
+      regenerateAllProblems();
     });
   }
 
-  // Optional: clicking outside all flashcards refreshes all cards
+  // React to number input changes (and also on blur for safety)
+  if (numCardsInput) {
+    numCardsInput.addEventListener('change', updateNumCards);
+    numCardsInput.addEventListener('blur', updateNumCards);
+  }
+
+  // Optional: clicking outside all flashcards refreshes problems
   document.body.addEventListener('click', function (event) {
     if (!flashcardsContainer.contains(event.target)) {
-      regenerateAll();
+      regenerateAllProblems();
     }
   });
+
 });

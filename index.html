@@ -8,14 +8,18 @@
 </head>
 <body>
 
-  <div class="mode-bar">
+  <div class="controls-bar" style="margin-bottom:1em; display:flex; align-items:center; gap:1.5em;">
     <label for="mode-select">
       Mode:
       <select id="mode-select">
         <option value="normal">Normal Random</option>
-        <option value="borrow">Borrow Required&nbsp;(ones digit less)</option>
-        <option value="noborrow">No Borrow&nbsp;(ones digit greater)</option>
+        <option value="borrow">Borrow Required (ones digit less)</option>
+        <option value="noborrow">No Borrow (ones digit greater)</option>
       </select>
+    </label>
+    <label for="num-cards">
+      Number of cards:
+      <input type="number" id="num-cards" min="1" max="50" value="10" style="width:3em;">
     </label>
   </div>
 
